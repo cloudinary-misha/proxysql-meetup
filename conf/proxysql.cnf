@@ -1,0 +1,53 @@
+datadir="/var/lib/proxysql"
+
+admin_variables=
+{
+    admin_credentials="admin:admin;radminuser:radminpass"
+    mysql_ifaces="0.0.0.0:6032"
+    refresh_interval=2000
+    web_enabled=true
+    web_port=6080
+    stats_credentials="stats:admin"
+}
+
+mysql_variables=
+{
+    threads=4
+    max_connections=2048
+    default_query_delay=0
+    default_query_timeout=36000000
+    have_compress=true
+    poll_timeout=2000
+    interfaces="0.0.0.0:6033;/tmp/proxysql.sock"
+    default_schema="information_schema"
+    stacksize=1048576
+    server_version="5.6.10"
+    monitor_enabled=0
+    connect_timeout_server=60000
+    connect_timeout_server_max=120000
+    ping_timeout_server=60000
+    commands_stats=true
+    sessions_sort=true
+    default_charset="utf8"
+}
+
+mysql_servers =
+(
+    { address="mysql_master" , port=3306 , hostgroup=1, max_connections=1000, status="ONLINE", comment="old cluster" },
+    { address="mysql_slave"  , port=3306 , hostgroup=2, max_connections=1000, status="OFFLINE_SOFT" , comment="new cluster"}
+)
+
+mysql_query_rules =
+(
+    {
+        rule_id=1
+        active=1
+        destination_hostgroup=1
+        apply=1
+    }
+)
+
+mysql_users =
+(
+    { username = "appuser", password = "1234", default_hostgroup = 1, transaction_persistent = 1, active = 1 }
+)
